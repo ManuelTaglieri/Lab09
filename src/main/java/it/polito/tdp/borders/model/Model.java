@@ -1,14 +1,18 @@
 package it.polito.tdp.borders.model;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.jgrapht.Graph;
 import org.jgrapht.alg.connectivity.ConnectivityInspector;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleGraph;
+import org.jgrapht.traverse.BreadthFirstIterator;
 
 import it.polito.tdp.borders.db.BordersDAO;
 
@@ -59,7 +63,43 @@ public class Model {
 		
 	}
 
-	public Collection<Country> getCountries() {
-		return paesi.values();
+	public List<Country> getCountries() {
+		List<Country> risultato = new LinkedList<>();
+		risultato.addAll(this.paesi.values());
+		
+		Collections.sort(risultato);
+		
+		return risultato;
 	}
+	
+	public List<Country> getStatiRaggiungibili(Country c) {
+		
+		BreadthFirstIterator<Country, DefaultEdge> bfi = new BreadthFirstIterator<>(this.grafo, c);
+		
+		List<Country> risultato = new LinkedList<>();
+		
+		while (bfi.hasNext()) {
+			Country ca = bfi.next();
+			risultato.add(ca);
+		}
+		
+		return risultato;
+	}
+	
+	public List<Country> getStatiRaggiungibili2 (Country c) {
+		
+		ConnectivityInspector<Country, DefaultEdge> ispettore = new ConnectivityInspector<>(this.grafo);
+		
+		Set<Country> insieme = ispettore.connectedSetOf(c);
+		List<Country> risultato = new LinkedList<>();
+		
+		for ( Country country : insieme ) {
+			risultato.add(country);
+		}
+		
+		return risultato;
+		
+	}
+	
+	
 }
